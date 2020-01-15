@@ -1,4 +1,0 @@
-tls.crt
-tls.key
-*-apiservice.yaml
-serving-cert-secret.yaml
