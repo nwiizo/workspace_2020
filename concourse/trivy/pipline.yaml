@@ -1,0 +1,15 @@
+---
+- task: Notify-cw
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: byrnedo/alpine-curl
+          tag: "latest"
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          curl -X POST -H "X-ChatWorkToken:{{cw-token}}" -d "body=Happy Pipline" "https://api.chatwork.com/v2/rooms/{{cw-room}}/messages"
