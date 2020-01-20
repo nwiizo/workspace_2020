@@ -5,10 +5,11 @@ metadata:
 spec:
   template:
     spec:
+      nodeName: <node-name>
       containers:
       - name: getnodecurl
         image:  byrnedo/alpine-curl:latest
-         command: ["curl"]
+        command: ["curl"]
         args: 
             - -s
             - inet-ip.info
