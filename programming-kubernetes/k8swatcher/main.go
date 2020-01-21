@@ -133,8 +133,8 @@ func (kw *KubeWatcher) Run() {
 			UpdateFunc: func(old, new interface{}) { kw.Sender <- NewKubeEvent(NodeUpdate, new) },
 		},
 	)
-	watchPods := cache.NewListWatchFromClient(
-		clientset.CoreV1().RESTClient(), string(v1.ResourcePods), v1.NamespaceAll, fields.Everything())
+
+	watchPods := cache.NewListWatchFromClient(clientset.CoreV1().RESTClient(), string(v1.ResourcePods), v1.NamespaceAll, fields.Everything())
 	_, podsController := cache.NewInformer(
 		watchPods, &v1.Pod{}, 0,
 		cache.ResourceEventHandlerFuncs{

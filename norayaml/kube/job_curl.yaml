@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  template:
+    spec:
+      nodeName: <node-name>
+      containers:
+      - name: getnodecurl
+        image:  byrnedo/alpine-curl:latest
+        command: ["curl"]
+        args: 
+            - -s
+            - inet-ip.info
+      restartPolicy: Never
+  backoffLimit: 4
