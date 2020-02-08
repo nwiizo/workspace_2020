@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>kyaml2go: Kubernetes client-go code generator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <!--Bootstrap version 4.3.1-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!--Code Mirror CSS-->
+    <link rel="stylesheet" type="text/css" href="plugin/codemirror/lib/codemirror.css">
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Main Style CSS-->
+    <link rel="stylesheet" href="./style.css" />
+    <!--Icon -->
+    <link rel="icon" type="image/gif/png"
+      href="https://raw.githubusercontent.com/PrasadG193/kyaml2go/master/k2go.png" />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150234067-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'UA-150234067-2');
+    </script>
+
+</head>
+
+<body>
+  <main role="main">
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron d-flex">
+      <img src="https://raw.githubusercontent.com/PrasadG193/kyaml2go/master/k2go.png" style="height: 102px">
+      <div class="infoData">
+        <div>
+          <h2 class="k2Go">
+            kyaml2go
+          </h2>
+          <span id="alpha">beta</span>
+          <p class="secondaryData">
+            Kubernetes client-go code generator for resource YAMLs
+          </p>
+        </div>  
+      </div>
+      <div id="view-source">
+          <a id="view-source-link" href="https://github.com/PrasadG193/kyaml2go"><i class="fa fa-github"></i> &nbsp;View Source</a>
+      </div>
+    </div>
+    <div id="error">
+      <span id="err-span">
+
+      </span>
+    </div>
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="position-relative row d-flex justify-content-between mt-4" style="height:65%;">
+        <div class="position-relative form-group apply_space" style="height:85%;">
+          <label for="yaml">YAML</label>
+          <textarea class="form-control codemirror-textarea" id="codegen" rows="15"></textarea>
+          <img src="./image/icn_delete.png" alt="delete" class="clear_code pointer" id="clearYaml" />
+        </div>
+        <div class="button_yaml" id="dd_wrapper">
+          
+          <select id="selectaction">
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+            <option value="get">Get</option>
+          </select>
+          <br>
+          <center>
+          <button class="btn" id="convert" title="Convert to Go"><i class="fa fa-arrow-circle-right fa-1x"></i></button>
+          </center>
+        </div>
+        <i class="glyphicon glyphicon-calendar"></i>
+        <div class="position-relative form-group apply_space" style="height:85%;">
+            <div>
+              <label for="goGenerator">GO</label> 
+              <span id="codecopied">code copied</span>
+              <i class="fa fa-copy flr" id="copybutton" title="Copy Code""></i>
+            </div>
+          <textarea class="form-control codemirror-textarea" id="goGenerator" rows="15"></textarea>
+          <img src="./image/icn_delete.png" alt="delete" class="clear_code pointer" id="clearGo" />
+        </div>
+      </div>
+      <hr>
+      <p class="credits">
+      We would love your input. Please feel free to send PRs and open issues on the <a href="https://github.com/PrasadG193/kyaml2go"> Github repo</a><br>
+      The Go Gopher is originally by <a href="http://reneefrench.blogspot.com">Renee French</a><br>
+      This artwork is borrowed from an awesome artwork collection by <a href="https://github.com/egonelbre/gophers">Egon Elbre</a><br>
+    </div> <!-- /container -->
+  </main>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="plugin/codemirror/lib/codemirror.js"></script>
+  <script src="plugin/codemirror/mode/go/go.js"></script>
+  <script src="plugin/codemirror/mode/yaml/yaml.js"></script>
+  <script src="./index.js"></script>
+</body>
+
+</html>

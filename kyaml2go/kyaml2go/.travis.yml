@@ -1,0 +1,27 @@
+language: go
+
+go:
+  - '1.11.x'
+
+services:
+  - docker
+
+env:
+  - GO111MODULE=on
+
+before_script:
+  - hack/verify-gofmt.sh
+  - hack/verify-golint.sh
+  - hack/verify-govet.sh
+
+jobs:
+  include:
+    - stage: test
+      before_script:
+        # Download and install Kind
+        - go get sigs.k8s.io/kind
+        # Create a new Kubernetes cluster using KinD
+        - kind create cluster
+        - go mod download
+      script:
+        - ./hack/e2e-test.sh
