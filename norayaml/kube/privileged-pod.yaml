@@ -1,3 +1,4 @@
+# kubectl exec -it privileged-pod -- sh
 apiVersion: v1
 kind: Pod
 metadata:

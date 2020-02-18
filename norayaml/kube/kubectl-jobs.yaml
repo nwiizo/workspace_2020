@@ -1,0 +1,33 @@
+# kubectl create configmap kube-config --from-file=config=~/.kube/config
+# kubectl apply -f kubectl-jobs.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubectl: get pod
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kubectl
+  name: kubectl
+spec:
+  template:
+    spec:
+      containers:
+        - image: bitnami/kubectl:latest
+          name: kubectl
+          command: ["kubectl"]
+          args: ["get", "pod"]
+          volumeMounts:
+          - name: kube-config
+            mountPath: /.kube/
+            readOnly: true
+          stdin: true
+      volumes:
+      - name: kube-config
+        configMap:
+          name: kube-config
+          items:
+            - key: config
+              path: config
+      restartPolicy: Never
