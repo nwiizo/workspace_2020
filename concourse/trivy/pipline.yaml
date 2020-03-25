@@ -1,15 +1,35 @@
 ---
-- task: Notify-cw
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: byrnedo/alpine-curl
-          tag: "latest"
-      run:
-        path: sh
-        args:
-        - -exc
-        - |
-          curl -X POST -H "X-ChatWorkToken:{{cw-token}}" -d "body=Happy Pipline" "https://api.chatwork.com/v2/rooms/{{cw-room}}/messages"
+- name: image-check
+  public: true
+  serial: true
+  plan:
+    - get: docker-image
+      trigger: true
+    - task: run
+      config:
+        inputs:
+          - name: docker-image
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: { repository: alpine }
+        run:
+          path: /bin/sh
+          args:
+          - -c
+          - |
+            echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+            echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+            apk --update add curl
+            apk add --no-cache ca-certificates
+            export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+            wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
+            tar -zxvf trivy_*.tar.gz
+            export DOMAIN=$(awk -F'/' '{print $5}' ./docker-image/repository)
+            export TRIVY_AUTH_URL=$(cat ./docker-image/repository)
+            export TRIVY_USERNAME=((gitlab-login-name))
+            export TRIVY_PASSWORD=((gitlab-login-password))
+            cat ./docker-image/repository
+            ./trivy ${TRIVY_AUTH_URL}:fly > result.txt
+            cat result.txt
+            curl -X POST -H "X-ChatWorkToken:{{cw-token}}" -d "body=[info][title] (cracker)Security check performed on Docker-image. ${DOMAIN} [/title]$(cat result.txt | grep Total)[/info]" "https://api.chatwork.com/v2/rooms/{{cw-room}}/messages"
