@@ -1,0 +1,19 @@
+goos: linux
+goarch: amd64
+BenchmarkJSON     	 1311076	       921 ns/op
+BenchmarkJSON     	 1325342	      1108 ns/op
+BenchmarkJSON     	 1232854	       957 ns/op
+BenchmarkJSON     	 1000000	      1051 ns/op
+BenchmarkJSON     	 1257844	      1022 ns/op
+BenchmarkJSON-2   	 1220914	       964 ns/op
+BenchmarkJSON-2   	 1201138	      1009 ns/op
+BenchmarkJSON-2   	 1213820	       961 ns/op
+BenchmarkJSON-2   	 1000000	      1003 ns/op
+BenchmarkJSON-2   	 1000000	      1011 ns/op
+BenchmarkJSON-4   	 1280401	       963 ns/op
+BenchmarkJSON-4   	 1285088	       952 ns/op
+BenchmarkJSON-4   	 1305969	       942 ns/op
+BenchmarkJSON-4   	 1307422	       964 ns/op
+BenchmarkJSON-4   	 1279186	       945 ns/op
+PASS
+ok  	_/home/smotouchi/github/workspace_2020/HighPerformanceWithGo/02-data-structures-and-algorithms/Benchstat-comparison/single	29.495s
