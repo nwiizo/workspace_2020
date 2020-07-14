@@ -1,0 +1,95 @@
+---
+apiVersion: nats.io/v1alpha2
+kind: NatsCluster
+metadata:
+  name: delivery-status-queue
+  namespace: delivery-status
+  annotations:
+    argocd.argoproj.io/hook: Skip
+  labels:
+    service: delivery-status
+    role: queue
+spec:
+  size: 3
+  version: "1.2.0"
+  pod:
+    enableConfigReload: true
+  auth:
+    #    clientsAuthSecret: "nats-clients-auth"
+    #    enableServiceAccounts: true
+
+# The ServiceAccount and NatsServiceRole definitions
+# are required to have the same name in the namespace.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nats-admin-user
+  namespace: delivery-status
+  labels:
+    service: delivery-status
+    role: queue
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nats-user
+  namespace: delivery-status
+  labels:
+    service: delivery-status
+    role: queue
+---
+apiVersion: nats.io/v1alpha2
+kind: NatsServiceRole
+metadata:
+  name: nats-user
+  namespace: delivery-status #nats-io
+  labels:
+    service: delivery-status
+    role: queue
+    nats_cluster: delivery-status-queue
+spec:
+  permissions:
+    publish: ["foo.*", "foo.bar.quux"]
+    subscribe: ["foo.bar", "greetings", "hello.world"]
+
+---
+apiVersion: nats.io/v1alpha2
+kind: NatsServiceRole
+metadata:
+  name: nats-admin-user
+  namespace: delivery-status #nats-io
+  labels:
+    service: delivery-status
+    role: queue
+    nats_cluster: delivery-status-queue
+spec:
+  permissions:
+    publish: [">"]
+    subscribe: [">"]
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nats-clients-auth
+  namespace: delivery-status
+  labels:
+    service: delivery-status
+    role: queue
+stringData:
+  clients-auth.json: |-
+    {
+      "users": [
+        { "username": "order", "password": "order",
+          "permissions": {
+            "publish": [">"],
+            "subscribe": [">"]
+          }
+        }
+      ],
+      "default_permissions": {
+        "publish": ["SANDBOX.*"],
+        "subscribe": ["PUBLIC.>"]
+      }
+    }

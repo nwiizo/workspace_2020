@@ -1,0 +1,165 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: github-listener
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: tekton-sa
+  serviceType: ClusterIP
+  triggers:
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: admin-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: cart-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: comment-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: delivery-status-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: order-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: payment-info-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: point-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: product-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: rate-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: search-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+    - template:
+        name: microservice-ci-trigger
+      bindings:
+      - name: user-ci
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-credentials
+              secretKey: github-webhook-secret
+              namespace: tekton-pipelines
+            eventTypes:
+              - push
+        - cel:
+           filter: body.ref == 'refs/heads/develop' && !body.commits[0].message.startsWith('[Update manifest]')
+---

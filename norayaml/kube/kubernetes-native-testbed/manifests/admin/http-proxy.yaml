@@ -1,0 +1,18 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: admin
+  namespace: admin
+  labels:
+    service: admin
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: admin
+          port: 8080
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /
+      permitInsecure: true

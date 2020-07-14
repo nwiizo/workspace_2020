@@ -1,0 +1,117 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: order-queue-cred
+  namespace: order
+  labels:
+    service: order
+    role: app
+data:
+  password: b3JkZXI=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  namespace: order
+  labels:
+    service: order
+    role: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: order
+      role: app
+  template:
+    metadata:
+      labels:
+        service: order
+        role: app
+    spec:
+      containers:
+        - name: order
+          image: registry-harbor-core.infra.svc.cluster.local/library/order:latest-cache
+          env:
+            - name: DB_HOST
+              value: order-db-tidb.order.svc.cluster.local
+            - name: DB_PORT
+              value: "4000"
+            - name: DB_USERNAME
+              value: orderuser
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-db
+                  key: orderuser
+            - name: DB_NAME
+              value: orderdb
+
+            - name: DELIVERY_STATUS_USERNAME
+              value: order
+            - name: DELIVERY_STATUS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-queue-cred
+                  key: password
+            - name: DELIVERY_STATUS_HOST
+              value: delivery-status-queue.delivery-status.svc.cluster.local
+            - name: DELIVERY_STATUS_PORT
+              value: "4222"
+            - name: DELIVERY_STATUS_SUBJECT
+              value: order
+
+            - name: POINT_QUEUE_HOST
+              value: point-queue-kafka-bootstrap.point.svc.cluster.local
+            - name: POINT_QUEUE_PORT
+              value: "9092"
+            - name: POINT_QUEUE_TOPIC
+              value: point-topic
+            - name: POINT_QUEUE_USER
+              value: point-user
+            - name: POINT_QUEUE_PASSWORD
+              value: qZ1OPWVDNE85
+            - name: USER_HOST
+              value: user.user.svc.cluster.local
+            - name: USER_PORT
+              value: "8080"
+            - name: PAYMENT_INFO_HOST
+              value: payment-info.payment-info.svc.cluster.local
+            - name: PAYMENT_INFO_PORT
+              value: "8080"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 10
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: order
+  labels:
+    service: order
+    role: app
+  annotations:
+    contour.heptio.com/upstream-protocol.h2c: "8080"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "http-port"
+      protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: order
+    role: app

@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  namespace: cart
+  labels:
+    service: cart
+    role: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: cart
+      role: app
+  template:
+    metadata:
+      labels:
+        service: cart
+        role: app
+    spec:
+      containers:
+        - name: cart
+          image: registry-harbor-core.infra.svc.cluster.local/library/cart:latest-cache
+          env:
+            - name: KVS_HOST
+              value: cart-db-pd.cart.svc.cluster.local
+            - name: KVS_PORT
+              value: "2379"
+            - name: AUTH_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtkey
+                  key: id_ecdsa_521.pub
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 10
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: cart
+  labels:
+    service: cart
+    role: app
+  annotations:
+    contour.heptio.com/upstream-protocol.h2c: "8080"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "http-port"
+      protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: cart
+    role: app
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwtkey
+  namespace: cart
+  labels:
+    service: cart
+    role: app
+stringData:
+  id_ecdsa_521.pub: |
+    -----BEGIN PUBLIC KEY-----
+    MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBjjADY22rVltjskWUQBxRHOftt1JQ
+    use7YfTpH8HVj6XFMQLjlTFLx2zcUyS2N3VnyfIGQpxG+HQ51FjSir5u604B+s+/
+    MQJBgk3xndzo+qhO1x+iLSwGNUdMeOTzDfu2oihta2dyRQwd6FQvnqLE7LA8ZWIS
+    7CtuWc6IFAUvbxeCEzw=
+    -----END PUBLIC KEY-----

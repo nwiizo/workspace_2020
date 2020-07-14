@@ -1,0 +1,20 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: cart
+  namespace: cart
+  labels:
+    service: cart
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: cart
+          port: 8080
+      conditions:
+        - prefix: /cart
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /cart
+      permitInsecure: true

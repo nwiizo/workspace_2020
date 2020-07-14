@@ -1,0 +1,42 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-issuer
+  namespace: infra
+spec:
+  acme:
+    email: amsy810@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: issuer-account-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: testbed.__LOADBALANCER_IP_ADDRESS__.nip.io
+  namespace: infra
+spec:
+  secretName: testbed-cert
+  issuerRef:
+    name: letsencrypt-issuer
+    kind: ClusterIssuer
+  dnsNames:
+  - testbed.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - argocd.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - tekton.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - harbor.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - notary.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - dashboard.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - rook.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - prometheus.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - grafana.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - alertmanager.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - weave-scope.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - yugabyte.__LOADBALANCER_IP_ADDRESS__.nip.io
+  - minio.__LOADBALANCER_IP_ADDRESS__.nip.io
+  commonName: testbed.__LOADBALANCER_IP_ADDRESS__.nip.io

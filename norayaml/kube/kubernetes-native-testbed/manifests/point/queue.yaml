@@ -1,0 +1,78 @@
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: Kafka
+metadata:
+  name: point-queue
+  namespace: point
+  annotations:
+    argocd.argoproj.io/hook: Skip
+  labels:
+    service: point
+    role: queue
+spec:
+  kafka:
+    version: 2.4.0
+    replicas: 3
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      log.message.format.version: "2.4"
+    storage:
+      type: jbod
+      volumes:
+      - id: 0
+        type: persistent-claim
+        size: 10Gi
+        deleteClaim: false
+        class: rook-ceph-block
+  zookeeper:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 10Gi
+      deleteClaim: false
+      class: rook-ceph-block
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: point-topic
+  namespace: point
+  labels:
+    strimzi.io/cluster: point-queue
+spec:
+  partitions: 1
+  replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: point-user
+  namespace: point
+  labels:
+    strimzi.io/cluster: point-queue
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: point-topic
+          patternType: literal
+        operation: "All"
+        host: "*"
+      - resource:
+          type: topic
+          name: test-topic
+          patternType: literal
+        operation: Read # "Read", "Write", "Create", "Delete", "Alter", "Describe", "ClusterAction", "AlterConfigs", "DescribeConfigs", "IdempotentWrite", "All"
+        host: "*"

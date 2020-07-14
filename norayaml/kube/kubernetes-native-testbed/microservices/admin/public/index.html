@@ -1,0 +1,685 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ 
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="uikit.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body class="uk-padding">
+    <h1 align="center">Client Page</h1>
+    <hr>
+
+
+    <!--
+      ###########################################################################################
+      # Product
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="product">
+      <div>
+        <h2>Product</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Name:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.name" type="text" placeholder="Sample Product"><br/>
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Price:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.price" type="text" placeholder="100"><br/>
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Images:</label></div>
+          <div class="uk-width-3-4">
+            <div uk-form-custom>
+              <input v-on:change="selectImage" type="file" multiple>
+              <button class="uk-button uk-button-default" type="button" tabindex="-1">Select Images</button>
+            </div>
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div>
+            <span v-for="(image, index) in form.images">
+              <img class="imagethumb" :key="index" v-bind:src="image">
+            </span>
+          </div>
+        </div>
+        </br>
+
+        <!--div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">ImageURLs:</label></div>
+          <div class="uk-width-3-4">
+            <span v-for="(url, index) in form.imageURLs">
+              <label>{{ index }}</label>
+              <input class="uk-input" v-model="url.value" :key="index" type="text" placeholder="http://example.com/image.png">
+            </span>
+            <button class="uk-button" v-on:click="addImageURL">+</button>
+          </div>
+        </div>
+        </br-->
+
+        <button class="uk-button uk-button-primary" v-on:click="getProduct">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setProduct">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateProduct">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteProduct">Delete</button>
+        <button class="uk-button uk-button-primary" v-on:click="isExistsProduct">ExistCheck</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.product }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # User
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="user">
+      <div>
+        <h2>User</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Username:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.username" type="text" placeholder="amsy810">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">FirstName:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.firstName" type="text" placeholder="Masaya">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">LastName:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.lastName" type="text" placeholder="Aoyama">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Age:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.age" type="text" placeholder="27">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Password:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.password" type="text" placeholder="PASSWORD">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Addresses:</label></div>
+          <div class="uk-width-3-4">
+            <span v-for="(address, index) in form.addresses">
+              <label>{{ index }}</label>
+              <input class="uk-input" v-model="address.zipCode" :key="`${index}-1`" type="text" placeholder="100-0000">
+              <input class="uk-input" v-model="address.country" :key="`${index}-2`" type="text" placeholder="Japan">
+              <input class="uk-input" v-model="address.state" :key="`${index}-3`" type="text" placeholder="Tokyo">
+              <input class="uk-input" v-model="address.city" :key="`${index}-4`" type="text" placeholder="Shibuya-ku">
+              <input class="uk-input" v-model="address.addressLine" :key="`${index}-5`" type="text" placeholder="1-2-3-100">
+              <input class="uk-input" v-model="address.disabled" :key="`${index}-6`" type="text" placeholder="true">
+            </span>
+            <button class="uk-button" v-on:click="addAddress">+</button>
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getUser">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setUser">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateUser">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteUser">Delete</button>
+        <button class="uk-button uk-button-primary" v-on:click="isExistsUser">ExistCheck</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+
+        <hr class="uk-divider-small">
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="authform.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Password:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="authform.password" type="text" placeholder="xxxxx">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="authUser">Authentication</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearAuthForm">Clear</button>
+      </div>
+
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.user }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Order
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="order">
+      <div>
+        <h2>Order</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">PaymentInfoUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.paymentInfoUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">AddressUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.addressUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">OrderedProducts:</label></div>
+          <div class="uk-width-3-4">
+            <span v-for="(orderedProduct, index) in form.orderedProducts">
+              <label>{{ index }}</label>
+              <input class="uk-input" v-model="orderedProduct.productUUID" :key="`${index}-1`" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+              <input class="uk-input" v-model="orderedProduct.count" :key="`${index}-2`" type="text" placeholder="10">
+              <input class="uk-input" v-model="orderedProduct.price" :key="`${index}-3`" type="text" placeholder="100">
+            </span>
+            <button class="uk-button" v-on:click="addOrderedProduct">+</button>
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getOrder">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setOrder">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateOrder">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteOrder">Delete</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.order }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+    <!--
+      ###########################################################################################
+      # PaymentInfo
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="paymentInfo">
+      <div>
+        <h2>Payment Info</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Name:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.name" type="text" placeholder="Main credit card">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">CardNumber:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.carNumber" type="text" placeholder="1234-5678-9012-3456">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">SecurityCode:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.securityCode" type="text" placeholder="123">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">ExpirationDate:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.expirationDate" type="text" placeholder="2025/01">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getPaymentInfo">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setPaymentInfo">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updatePaymentInfo">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deletePaymentInfo">Delete</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.paymentInfo }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Point
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="point">
+      <div>
+        <h2>Point</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Balance:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.balance" type="text" placeholder="100">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Description:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.description" type="text" placeholder="shopping service point at 2020/01/01 10:00:00">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getPoint">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setPoint">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updatePoint">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deletePoint">Delete</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+
+        <hr class="uk-divider-small">
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="totalAmountForm.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getTotalAmount">Get Total Amount</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearTotalAmountForm">Clear</button>
+      </div>
+
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.point }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Delivery Status
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="delivery-status">
+      <div>
+        <h2>Delivery Status</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">OrderUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.orderUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Status:</label></div>
+          <div class="uk-width-3-4">
+            <select class="uk-select" v-model="form.status">
+              <option value="1" selected>Waiting</option>
+              <option value="2">Preparing</option>
+              <option value="3">Shipping</option>
+              <option value="4">Delivered</option>
+            </select>
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">InquiryNumber:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.inquiryNumber" type="text" placeholder="000-0000000-0000000">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getDeliveryStatus">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setDeliveryStatus">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateDeliveryStatus">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteDeliveryStatus">Delete</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+
+
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.deliveryStatus }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Cart
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="cart">
+      <div>
+        <h2>Cart</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">CartProducts:</label></div>
+          <div class="uk-width-3-4">
+            <span v-for="(cartProduct, index) in form.cartProducts">
+              <label>{{ index }}</label>
+              <input class="uk-input" v-model="cartProduct.productUUID" :key="`${index}-1`" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+              <input class="uk-input" v-model="cartProduct.count" :key="`${index}-2`" type="text" placeholder="10">
+            </span>
+            <button class="uk-button" v-on:click="addCartProduct">+</button>
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="showCart">Show</button>
+        <button class="uk-button uk-button-primary" v-on:click="addCart">Add</button>
+        <button class="uk-button uk-button-primary" v-on:click="removeCart">Remove</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+        </br>
+
+        <hr class="uk-divider-small">
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="commitform.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">AddressUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="commitform.addressUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">PaymentInfoUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="commitform.paymentInfoUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="commitCart">Commit</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearCommitForm">Clear</button>
+
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.cart }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Rate
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="rate">
+      <div>
+        <h2>Rate</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">CommentUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.commentUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">ProductUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.productUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Rating:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.rating" type="text" placeholder="5"><br/>
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getRate">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setRate">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateRate">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteRate">Delete</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.rate }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!--
+      ###########################################################################################
+      # Comment
+      ###########################################################################################
+    -->
+    <hr>
+    <div id="comment">
+      <div>
+        <h2>Comment</h2>
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">UserUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.userUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">ParentCommentUUID:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.parentCommentUUID" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+          </div>
+        </div>
+        </br>
+
+        <div uk-grid>
+          <div class="uk-width-1-4"><label class="uk-align-right">Message:</label></div>
+          <div class="uk-width-3-4">
+            <input class="uk-input" v-model="form.message" type="text" placeholder="This is good product!"><br/>
+          </div>
+        </div>
+        </br>
+
+        <button class="uk-button uk-button-primary" v-on:click="getComment">Get</button>
+        <button class="uk-button uk-button-primary" v-on:click="setComment">Set</button>
+        <button class="uk-button uk-button-primary" v-on:click="updateComment">Update</button>
+        <button class="uk-button uk-button-primary" v-on:click="deleteComment">Delete</button>
+        <button class="uk-button uk-button-primary" v-on:click="isExistsComment">ExistCheck</button>
+        <button class="uk-button uk-button-primary" v-on:click="childComments">ChildComments</button>
+        <button class="uk-button uk-button-danger" v-on:click="clearForm">Clear</button>
+      </div>
+      <hr class="uk-divider-small">
+      <label>Response</label><br/>
+      <div class="output">
+        <textarea class="uk-textarea" rows=5>{{ resp.comment }}</textarea>
+        <span v-show="resp.errorCode != 0">Error: {{ resp.errorMsg }}({{ resp.errorCode }})</span>
+      </div>
+    </div>
+
+
+    <!-- 
+      ###########################################################################################
+      # Utils
+      ###########################################################################################
+    -->
+    <script src="./bundle.js"></script>
+  </body>
+</html>

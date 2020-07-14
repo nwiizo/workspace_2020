@@ -1,0 +1,224 @@
+
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: test-topic
+  namespace: point
+  labels:
+    strimzi.io/cluster: point-queue
+spec:
+  partitions: 1
+  replicas: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-scripts-queue
+  namespace: point
+  labels:
+    service: point
+    role: check
+data:
+  check.sh: |-
+    #!/bin/bash
+    echo "check script running..."
+    echo "This is test message at [$(date)]." | bin/kafka-console-producer.sh --broker-list ${QUEUE_HOST}:${QUEUE_PORT} --topic ${QUEUE_TOPIC}
+    bin/kafka-console-consumer.sh --bootstrap-server ${QUEUE_HOST}:${QUEUE_PORT} --topic ${QUEUE_TOPIC} --from-beginning --timeout-ms 10000
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: check-job-queue
+  namespace: point
+  labels:
+    service: point
+    role: check
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Replace
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      completions: 1
+      parallelism: 1
+      backoffLimit: 10
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: check-container
+            image: strimzi/kafka:0.16.2-kafka-2.4.0
+            command:
+            - /scripts/check.sh
+            env:
+            - name: QUEUE_HOST
+              value: point-queue-kafka-bootstrap.point.svc.cluster.local
+            - name: QUEUE_PORT
+              value: "9092"
+            - name: QUEUE_TOPIC
+              value: test-topic
+            - name: QUEUE_USER
+              value: point-user
+            - name: QUEUE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: point-user
+                  key: user.password
+            volumeMounts:
+            - name: scripts-volume
+              mountPath: /scripts
+          volumes:
+            - name: scripts-volume
+              configMap:
+                name: check-scripts-queue
+                defaultMode: 493 # mode 755
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-scripts-kvs
+  namespace: point
+  labels:
+    service: point
+    role: check
+data:
+  check.sh: |-
+    #!/bin/sh
+    echo "check script running..."
+    (echo "set checkjob-key 0 40 6"; echo "value1"; sleep 1;) | telnet ${KVS_HOST} ${KVS_PORT}
+    (echo "get checkjob-key"; sleep 1;) | telnet ${KVS_HOST} ${KVS_PORT}
+    exit 0
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: check-job-kvs
+  namespace: point
+  labels:
+    service: point
+    role: check
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Replace
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      completions: 1
+      parallelism: 1
+      backoffLimit: 10
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: check-container
+            image: busybox
+            command:
+            - /scripts/check.sh
+            env:
+            - name: KVS_HOST
+              value: point-kvs-memcached.point.svc.cluster.local
+            - name: KVS_PORT
+              value: "11211"
+            volumeMounts:
+            - name: scripts-volume
+              mountPath: /scripts
+          volumes:
+            - name: scripts-volume
+              configMap:
+                name: check-scripts-kvs
+                defaultMode: 493 # mode 755
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-scripts-db
+  namespace: point
+  labels:
+    service: point
+    role: check
+data:
+  check.sh: |-
+    #!/bin/sh
+    echo "check script running..."
+
+    # postgres compatible
+    export PGPASSWORD=${DB_PASSWORD}
+    /home/yugabyte/bin/ysqlsh -h ${DB_HOST} -p ${DB_PORT_YPOSTGRES} -d ${DB_NAME} -U ${DB_USER} -c "\l"
+    /home/yugabyte/bin/ysqlsh -h ${DB_HOST} -p ${DB_PORT_YPOSTGRES} -d ${DB_NAME} -U ${DB_USER} -c "\dt"
+    /home/yugabyte/bin/ysqlsh -h ${DB_HOST} -p ${DB_PORT_YPOSTGRES} -d ${DB_NAME} -U ${DB_USER} -c "\du"
+
+    # cassandra compatible
+    /home/yugabyte/bin/cqlsh ${DB_HOST} ${DB_PORT_YCASSANDRA} -e "DESCRIBE TABLES;"
+
+    # redis compatible
+    /home/yugabyte/bin/redis-cli -h ${DB_HOST} -p ${DB_PORT_YREDIS} -r 10 ping
+    /home/yugabyte/bin/redis-cli -h ${DB_HOST} -p ${DB_PORT_YREDIS} info
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: check-job-db
+  namespace: point
+  labels:
+    service: point
+    role: check
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Replace
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      completions: 1
+      parallelism: 1
+      backoffLimit: 10
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: check-container
+            image: yugabytedb/yugabyte:2.0.10.0-b4
+            command:
+            - /scripts/check.sh
+            env:
+            - name: DB_HOST
+              value: yb-tserver-point-db-0.yb-tservers-point-db.point.svc.cluster.local
+            - name: DB_PORT_YPOSTGRES
+              value: "5433"
+            - name: DB_PORT_YCASSANDRA
+              value: "9042"
+            - name: DB_PORT_YREDIS
+              value: "6379"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: point-db-credentials
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: point-db-credentials
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: point-db-credentials
+                  key: DB_PASSWORD
+            volumeMounts:
+            - name: scripts-volume
+              mountPath: /scripts
+          volumes:
+            - name: scripts-volume
+              configMap:
+                name: check-scripts-db
+                defaultMode: 493 # mode 755
+---

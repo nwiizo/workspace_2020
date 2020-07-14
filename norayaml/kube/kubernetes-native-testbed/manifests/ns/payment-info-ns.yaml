@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payment-info
+  labels:
+    service: payment-info
+    role: ns

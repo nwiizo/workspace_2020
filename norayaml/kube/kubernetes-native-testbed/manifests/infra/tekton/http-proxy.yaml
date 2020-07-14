@@ -1,0 +1,21 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: tekton
+  namespace: tekton-pipelines
+  labels:
+    service: tekton
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: tekton-dashboard
+          port: 9097
+      permitInsecure: true
+    - conditions:
+      - prefix: /event-listener
+      services:
+        - name: el-github-listener
+          port: 8080
+      permitInsecure: true

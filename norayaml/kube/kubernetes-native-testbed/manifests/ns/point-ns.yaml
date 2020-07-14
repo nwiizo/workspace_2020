@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: point
+  labels:
+    service: point
+    role: ns

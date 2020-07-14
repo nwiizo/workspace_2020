@@ -1,0 +1,20 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: user
+  namespace: user
+  labels:
+    service: user
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: user
+          port: 8080
+      conditions:
+        - prefix: /user
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /user
+      permitInsecure: true

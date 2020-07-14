@@ -1,0 +1,123 @@
+# curl https://raw.githubusercontent.com/rook/rook/master/cluster/examples/kubernetes/ceph/cluster.yaml > ceph.yaml
+#  and ref: https://github.com/rook/rook/blob/master/Documentation/ceph-block.md 
+#################################################################################################################
+# Define the settings for the rook-ceph cluster with common settings for a production cluster.
+# All nodes with available raw devices will be used for the Ceph cluster. At least three nodes are required
+# in this example. See the documentation for more details on storage settings available.
+
+# For example, to create the cluster:
+#   kubectl create -f common.yaml
+#   kubectl create -f operator.yaml
+#   kubectl create -f cluster.yaml
+#################################################################################################################
+---
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  cephVersion:
+    image: ceph/ceph:v14.2.6
+    allowUnsupported: false
+  dataDirHostPath: /var/lib/rook
+  skipUpgradeChecks: false
+  continueUpgradeAfterChecksEvenIfNotHealthy: false
+  mon:
+    count: 3
+    allowMultiplePerNode: false
+  dashboard:
+    enabled: true
+    ssl: false
+    urlPrefix: /
+  monitoring:
+    enabled: true
+    rulesNamespace: rook-ceph
+  network:
+    hostNetwork: false
+  rbdMirroring:
+    workers: 0
+  crashCollector:
+    disable: false
+  annotations:
+  resources:
+  removeOSDsIfOutAndSafeToRemove: true
+  storage: # cluster level storage configuration and selection
+    useAllNodes: true
+    useAllDevices: false
+    config:
+      storeType: filestore
+    directories:
+    - path: "/mnt/stateful_partition/rook"
+  disruptionManagement:
+    managePodBudgets: true
+    osdMaintenanceTimeout: 30
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-block
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+    clusterID: rook-ceph
+    pool: replicapool
+    imageFormat: "2"
+    imageFeatures: layering
+
+    csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+    csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+    csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+    csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
+    csi.storage.k8s.io/fstype: xfs
+
+reclaimPolicy: Delete
+---
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  name: cephfs
+  namespace: rook-ceph
+spec:
+  metadataPool:
+    failureDomain: host
+    replicated:
+      size: 3
+  dataPools:
+    - failureDomain: host
+      replicated:
+        size: 3
+  preservePoolsOnDelete: true
+  metadataServer:
+    activeCount: 1
+    activeStandby: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-cephfs
+provisioner: rook-ceph.cephfs.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+
+  fsName: cephfs
+
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
+reclaimPolicy: Delete
+

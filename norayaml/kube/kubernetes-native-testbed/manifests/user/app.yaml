@@ -1,0 +1,114 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: user
+  labels:
+    service: user
+    role: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: user
+      role: app
+  template:
+    metadata:
+      labels:
+        service: user
+        role: app
+    spec:
+      containers:
+        - name: user
+          image: registry-harbor-core.infra.svc.cluster.local/library/user:latest-cache
+          env:
+            - name: DB_HOST
+              value: user-db-mysql-master.user.svc.cluster.local
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db
+                  key: USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db
+                  key: PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db
+                  key: DATABASE
+            - name: PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtkey
+                  key: id_ecdsa_521
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            initialDelaySeconds: 10
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  namespace: user
+  labels:
+    service: user
+    role: app
+  annotations:
+    contour.heptio.com/upstream-protocol.h2c: "8080"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "http-port"
+      protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: user
+    role: app
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwtkey
+  namespace: user
+  labels:
+    service: user
+    role: app
+stringData:
+  id_ecdsa_521: |
+    -----BEGIN EC PRIVATE KEY-----
+    MIHcAgEBBEIByKwpXWbEu+dn5fqx9xC+dWv9HFqWEMV4vZAaRqVc/6lz9CNFkOpd
+    PjECOpHFbYj5D+HM5lt9ePwxpgCjTlx+wVCgBwYFK4EEACOhgYkDgYYABAGOMANj
+    batWW2OyRZRAHFEc5+23UlC6x7th9OkfwdWPpcUxAuOVMUvHbNxTJLY3dWfJ8gZC
+    nEb4dDnUWNKKvm7rTgH6z78xAkGCTfGd3Oj6qE7XH6ItLAY1R0x45PMN+7aiKG1r
+    Z3JFDB3oVC+eosTssDxlYhLsK25ZzogUBS9vF4ITPA==
+    -----END EC PRIVATE KEY-----
+  id_ecdsa_521.pub: |
+    -----BEGIN PUBLIC KEY-----
+    MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBjjADY22rVltjskWUQBxRHOftt1JQ
+    use7YfTpH8HVj6XFMQLjlTFLx2zcUyS2N3VnyfIGQpxG+HQ51FjSir5u604B+s+/
+    MQJBgk3xndzo+qhO1x+iLSwGNUdMeOTzDfu2oihta2dyRQwd6FQvnqLE7LA8ZWIS
+    7CtuWc6IFAUvbxeCEzw=
+    -----END PUBLIC KEY-----

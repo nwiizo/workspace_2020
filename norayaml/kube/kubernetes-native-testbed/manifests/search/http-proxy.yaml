@@ -1,0 +1,32 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: search
+  namespace: search
+  labels:
+    service: search
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: search
+          port: 8080
+      conditions:
+      - prefix: /
+      permitInsecure: true
+    - services:
+        - name: search-db-es-http
+          port: 9200
+      conditions:
+      - prefix: /es
+      permitInsecure: true
+    - services:
+        - name: search-db-kb-http
+          port: 5601
+      conditions:
+      - prefix: /kibana
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /
+      permitInsecure: true

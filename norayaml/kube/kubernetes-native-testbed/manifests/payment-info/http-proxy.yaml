@@ -1,0 +1,20 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: payment-info
+  namespace: payment-info
+  labels:
+    service: payment-info
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: payment-info
+          port: 8080
+      conditions:
+        - prefix: /paymentinfo
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /paymentinfo
+      permitInsecure: true

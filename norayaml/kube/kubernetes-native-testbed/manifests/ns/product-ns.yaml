@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: product
+  labels:
+    service: product
+    role: ns

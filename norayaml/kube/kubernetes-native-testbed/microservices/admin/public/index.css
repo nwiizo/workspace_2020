@@ -1,0 +1,33 @@
+.output {
+  font-family: Consolas;
+  font-size: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  /*border: 1px solid #333333;*/
+}
+
+.section {
+    color: "#000000";
+    width: "100%";
+    size: "3";
+    align: "left";
+}
+
+.imagethumb {
+  height: 100px;
+}
+
+body {
+  margin: 10px 50px;
+}
+
+input {
+  margin: 4px 0px;
+}
+
+label {
+  font-weight: bold;
+  font-size: 120%;
+  text-align: center;
+}
+

@@ -1,0 +1,26 @@
+---
+apiVersion: skaffold/v2alpha3
+kind: Config
+build:
+  artifacts:
+  - image: local-point
+    docker:
+      dockerfile: ./point/Dockerfile
+    context: ../
+  tagPolicy:
+    envTemplate:
+      template: "local-point:latest"
+  local:
+    push: false
+deploy:
+  kustomize:
+    paths:
+    - ../../development/point
+    buildArgs:
+    - --load_restrictor
+    - LoadRestrictionsNone
+    flags:
+      delete:
+      - --force
+      - --grace-period=0
+      - --wait

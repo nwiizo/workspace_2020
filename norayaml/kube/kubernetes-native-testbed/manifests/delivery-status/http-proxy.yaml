@@ -1,0 +1,20 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: delivery-status
+  namespace: delivery-status
+  labels:
+    service: delivery-status
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: delivery-status
+          port: 8080
+      conditions:
+        - prefix: /deliverystatus
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /deliverystatus
+      permitInsecure: true

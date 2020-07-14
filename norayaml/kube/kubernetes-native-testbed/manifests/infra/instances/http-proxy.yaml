@@ -1,0 +1,447 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: namespace-delegation-root
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: testbed.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  # delegate the subpath, `/product` to the HTTPProxy object in the product namespace with the name `product`
+  - name: product
+    namespace: product
+    conditions:
+    - prefix: /product
+  - name: payment-info
+    namespace: payment-info
+    conditions:
+    - prefix: /paymentinfo
+  - name: user
+    namespace: user
+    conditions:
+    - prefix: /user
+  - name: delivery-status
+    namespace: delivery-status
+    conditions:
+    - prefix: /deliverystatus
+  - name: comment
+    namespace: comment
+    conditions:
+    - prefix: /comment
+  - name: order
+    namespace: order
+    conditions:
+    - prefix: /order
+  - name: rate
+    namespace: rate
+    conditions:
+    - prefix: /rate
+  - name: cart
+    namespace: cart
+    conditions:
+    - prefix: /cart
+  - name: point
+    namespace: point
+    conditions:
+    - prefix: /point
+  - name: search
+    namespace: search
+    conditions:
+    - prefix: /search
+  - name: admin
+    namespace: admin
+    conditions:
+    - prefix: /admin
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+    - services:
+        - name: default-http-backend
+          port: 8080
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: argocd-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: argocd.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: argocd
+    namespace: argocd
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: tekton-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: tekton.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: tekton
+    namespace: tekton-pipelines
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: harbor-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: harbor.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: harbor
+    namespace: infra
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: notary-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: notary.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: notary
+    namespace: infra
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: dashboard-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: dashboard.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: dashboard
+    namespace: kubernetes-dashboard
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: rook-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: rook.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: rook
+    namespace: rook-ceph
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: prometheus-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: prometheus.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: prometheus
+    namespace: monitoring
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: grafana-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: grafana.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: grafana
+    namespace: monitoring
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: alertmanager-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: alertmanager.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: alertmanager
+    namespace: monitoring
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: weave-scope-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: weave-scope.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: weave-scope
+    namespace: weave
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: yugabyte-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: yugabyte.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: yugabyte
+    namespace: rook-yugabytedb-system
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: minio-httpproxy
+  namespace: infra
+  labels:
+    service: infra
+    role: proxy
+spec:
+  virtualhost:
+    fqdn: minio.__LOADBALANCER_IP_ADDRESS__.nip.io
+    tls:
+      secretName: testbed-cert
+  includes:
+  - name: minio
+    namespace: infra
+    conditions:
+    - prefix: /
+  routes:
+    - conditions:
+      - prefix: /.well-known/acme-challenge
+      services:
+        - name: infra-nginx-ingress-controller
+          port: 80
+      permitInsecure: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-http-backend
+  labels:
+    app: default-http-backend
+  namespace: infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: default-http-backend
+  template:
+    metadata:
+      labels:
+        app: default-http-backend
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: default-http-backend
+        image: gcr.io/google_containers/defaultbackend:1.4
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: infra
+  labels:
+    app: default-http-backend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: default-http-backend
+---
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNvakNDQVlvQ0NRQ2Q3dktIdVRVSExUQU5CZ2txaGtpRzl3MEJBUXNGQURBVE1SRXdEd1lEVlFRRERBZ3EKTG5ocGNDNXBiekFlRncweU1EQXpNREV4TkRRMU5ETmFGdzB5TVRBek1ERXhORFExTkROYU1CTXhFVEFQQmdOVgpCQU1NQ0NvdWVHbHdMbWx2TUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF0RE01CnJ5RXFlUnhZb05kODhqbi9vL3lvVUpCU2k3UmhVMXBKYVo0TzQzYUY1MTJmZm5VaHhxdXJQeEtoU3VzYjBaak0KVlg0cEoxYmVDUmNOdDQwT1FPazJKYW45RUZFdVdHYmpJaVJ3bXhQdUFxWWpESWFJZk16U1ZPcnNTMjFZL1JBSgpZSURiV3hwbjM0azNzN2hEZXpWNkVWNnl1ZEtYT2RSWHVkRXZEUnM3ZkhibXhqWkgxVS9UU0NTb2tQZEt4TzFoClFVSEFzOGsxM0ZHYWY4dGRFOXUycm1HNmRTQU5QSTUyVW1qVXlsM2d0ZnUvd3doMlk0cTVrWU83eE9BdVorNnYKR29aYmtRNzJxRnU0aW9HbDk2V0dxeHdQUm9Nb0Fid2syb1VxeFo0emRSRmg1aXRmZ3lQWE5lWmFWSk5VOHluRgpMKzMyN0hPSWVmdXpzeG4vQ3dJREFRQUJNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFPNEw0MklpUmNEZTl4CkdmRWJONXo5dDV5RkpveWNLWi9qN0NrMGxhVjQ2akxGZjV6RC9PU2pEVzlsN2hscnR0NHRKNUU0UnBtTHBaUEMKVE5CMnBzT0xCQ3lKRDJxZEt0eXNRaW1zVnNPNDhyUzVKRElaanplcW9NZDZBckNNQTRvZFRtSDBKVnQrQWR5YQpTUE14RTBMVkpCbkRsYnBxMkd2dzVmQ292YUhvUnlmUFNPZkxHVVF3allJQnlrU0xOYkcrTkc0MUZHTzVObmR1CmoyZzhaOTFBenlGaHQyeVh5KzRaM1BwTlZYM1JTQzF5dk1RWnN5UWxYZE8yd0VDSmxPOWllRFAwZEtSM2JmM0kKR3dXeW5ldDFlcFo0NHhhZmo5czFFTk1xQ3dpNG1lZmhOWHhsRCtUWTRKN1F0MkRxQ0VGMnFJUjBzWVVwNUNxVApUS0t6MkdXMwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQzBNem12SVNwNUhGaWcKMTN6eU9mK2ovS2hRa0ZLTHRHRlRXa2xwbmc3amRvWG5YWjkrZFNIR3E2cy9FcUZLNnh2Um1NeFZmaWtuVnQ0SgpGdzIzalE1QTZUWWxxZjBRVVM1WVp1TWlKSENiRSs0Q3BpTU1ob2g4ek5KVTZ1eExiVmo5RUFsZ2dOdGJHbWZmCmlUZXp1RU43TlhvUlhySzUwcGM1MUZlNTBTOE5HenQ4ZHViR05rZlZUOU5JSktpUTkwckU3V0ZCUWNDenlUWGMKVVpwL3kxMFQyN2F1WWJwMUlBMDhqblpTYU5US1hlQzErNy9EQ0haamlybVJnN3ZFNEM1bjdxOGFobHVSRHZhbwpXN2lLZ2FYM3BZYXJIQTlHZ3lnQnZDVGFoU3JGbmpOMUVXSG1LMStESTljMTVscFVrMVR6S2NVdjdmYnNjNGg1Cis3T3pHZjhMQWdNQkFBRUNnZ0VCQUlzalBuZ09DTWlJN1pvTHFRc3pZME9RczdtNUpqTis3T002UkpNTG12MWgKSjlWVXdmRVhxaVBIcTZ0QXpFK1hwOXczdWhhTkdtT292RHFTbFdIVHhWeXpkYjZ4T1poZXhvVTF0RTFKaTdVQwpOM1hPS0NQa3dRQnoramZkU09TWW91eUxkR0lTUE0xa1h5NEh1bjNIV2p1Sk9CNnZXeHNHRXdSeEErZVRNRnhTCkMvMStsdHdxbTRGZ0IzUHVTUWtXaG1CSTUxamxGT3dwNkdTNmdXWTMrMTVOMUdPRVhGOFdzNlY2ejZzWVV1RzcKNGNZYTZaMWpPMVM4M01zdU5BbmpiY2JDZVllSml3QWZaNW80SFEvSXhTdTQwWlE0ekNwL1dWMTU5VlNWd0hWMQorSGlRRXQ0ZUZVSVk4NVlKNlRCcGRscUNma3FTQ3Y2Q1ZVbkZOeEYrUmJrQ2dZRUE3NFRhdFNWcUcrSHo4UlhRCkI4b2NmaU1aSHFkWFYrVUZTNytVQlRSczJoZFZxV1N4MVRLcXQ2WUFDT3gvd1ZaNVlyL1lRcDVXZ0JkaDZneTAKcHgvOWdrZlRrTEpCZy84ZGVPSmhUK3ZqY1pNSzRZSVVQT0gwMldtdWlodzM3UUJncDJqS21uak9iZUNGVm1yawozaURkemhwVUpuWFFIOWNxTzVOZDRHcU9lUWNDZ1lFQXdKbDI2RVlsOGZIQXBQS1gvUmRnTW8wdWx4dUxoaURhCmNjVlkxOGZ4NGREU3RsbzRuRGMwNzB0Z29mT0t2SEFVU3JiSURJM1U4NVM2eVBqa2VWZkE5TFg0M2pMVW1IZEoKRkRiaTE2elBMbE1qK0VvVU9zWCtsUE0vK1FVYUV3KzR3NTVGWlU2aFJNaXFyODVranlxZitnVWtVRWd5VWpkVQo2Q0FSb3ZJN1hOMENnWUVBazZhQ2JFaTBNSndKbFFTdFNSLytrSU55YU1NZnhMOFpsS2gweHdDYVdaY281MU43CmpNRy9HNWJwVHBiNzZtTTBVUHVTaFA2MnRCKzE3R0lJdXoydE9US3Q2UFQ2RGpTbUptN25MaTFyK0FkOUhhYmkKY3VXWDJxNmJPZWhMVVg1NkZya3lyQ2JzbWk5ZUF2ZkNQbXhrVHpsTHhxbTVzdWNnMGJqMmxmRWFBdUVDZ1lCeApqSWpNSEQ5V3l6N1dnS2dXOE9jb0pwQm5TamdTRmVCejN2T29GQnVKRk1LRis5OFFTb1FNNkpYS0pYbVA2MHdyCldHUE04dm12dWVuOWZxL0UwblhTVUU2dlFheVJUeEpvdG9zNnVJbFZPSE1tZVJaQUtHY1ZqZXdUZG15Ty9GL2sKQkxYSktuaHR3eGpPbVpJenpkK1BXZVMwNkR1eXVTaDN5aUJidnhBOGlRS0JnSEMxMWRvdEtaVzR1SGdwWGRxdApCeGxVNy9QV09sVmNiTWNqM3oyNytRRHpFODQ2K2hJZ05XVWdYWnVJdmd6eHlPR0dPeFJGOU5xWVpWTnRmbHZWCm1hTDJmVGZqc2UxU1RYb09VZHVhYjFEb0s2b3pmbTR5bG5ENjIwL0RBSEtyQnlKT0wyR0FwSlN2NVcwenhBTUkKY1lMRVVqUzdHaGxySi94dkZ6SUx0YmVjCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+kind: Secret
+metadata:
+  name: testbed-cert
+  namespace: infra
+  annotations:
+    argocd.argoproj.io/hook: Skip
+type: kubernetes.io/tls

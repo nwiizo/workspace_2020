@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: delivery-status
+  labels:
+    service: delivery-status
+    role: ns

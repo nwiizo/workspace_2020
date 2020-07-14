@@ -1,0 +1,49 @@
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: point
+  namespace: point
+  labels:
+    service: point
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: point
+          port: 8080
+      conditions:
+        - prefix: /point
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /point
+      permitInsecure: true
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: yugabyte
+  namespace: point
+  labels:
+    service: yugabyte
+    role: proxy
+spec:
+  routes:
+    - services:
+        - name: yb-master-ui-point-db
+          port: 7000
+      conditions:
+      - prefix: /master
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /
+      permitInsecure: true
+    - services:
+        - name: yb-tserver-ui-point-db
+          port: 9000
+      conditions:
+      - prefix: /tserver
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /tserver
+      permitInsecure: true
