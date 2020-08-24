@@ -40,7 +40,7 @@ func main() {
 			if !ok {
 				return
 			}
-			msg := fmt.Sprintf("Container Name: %s \n Memory usage: %d", container.Name, memQuantity)
+			msg := fmt.Sprintf("Container Name: %s Memory usage: %d", container.Name, memQuantity)
 			fmt.Println(msg)
 		}
 	}
