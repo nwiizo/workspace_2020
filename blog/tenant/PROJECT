@@ -1,0 +1,7 @@
+domain: example.com
+repo: github.com/nwiizo/workspace_2020/blog/tenant
+resources:
+- group: multitenancy
+  kind: Tenant
+  version: v1
+version: "2"
