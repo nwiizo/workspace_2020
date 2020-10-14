@@ -1,4 +1,4 @@
-module kubebuildersample
+module my.domain
 
 go 1.13
 

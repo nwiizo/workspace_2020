@@ -1,5 +1,5 @@
 /*
-Copyright 2020 nwiizo.
+
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		Port:               9443,
 		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "b57ebf3d.my.domain",
+		LeaderElectionID:   "effa284b.my.domain",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
