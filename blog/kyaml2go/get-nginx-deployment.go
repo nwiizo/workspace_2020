@@ -21,7 +21,7 @@ func main() {
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		panic(err)
+		//panic(err)
 	}
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -37,4 +37,3 @@ func main() {
 	}
 
 }
-

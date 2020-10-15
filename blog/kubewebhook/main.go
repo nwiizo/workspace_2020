@@ -28,7 +28,10 @@ func annotatePodMutator(_ context.Context, obj metav1.Object) (bool, error) {
 	}
 	pod.Annotations["mutated"] = "true"
 	pod.Annotations["mutator"] = "pod-annotate"
-
+	if pod.Labels == nil {
+		pod.Labels = make(map[string]string)
+	}
+	pod.Labels["webhook"] = "true"
 	return false, nil
 }
 

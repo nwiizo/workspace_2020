@@ -17,11 +17,12 @@ func main() {
 	// Create client
 	var kubeconfig string
 	kubeconfig, ok := os.LookupEnv("KUBECONFIG")
+	fmt.Println(kubeconfig)
 	if !ok {
 		kubeconfig = filepath.Join(homedir.HomeDir(), ".kube", "config")
 	}
-
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	fmt.Println(config)
 	if err != nil {
 		panic(err)
 	}
@@ -88,4 +89,3 @@ func main() {
 func ptrint32(p int32) *int32 {
 	return &p
 }
-
