@@ -1,0 +1,91 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: foos.foo.samplecontroller.k8s.io
+spec:
+  group: foo.samplecontroller.k8s.io
+  names:
+    kind: Foo
+    listKind: FooList
+    plural: foos
+    singular: foo
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      description: Foo is the Schema for the foos API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: FooSpec defines the desired state of Foo
+          properties:
+            deploymentname:
+              type: string
+            foo:
+              description: Foo is an example field of Foo. Edit Foo_types.go to remove/update
+              type: string
+            replicas:
+              type: integer
+          type: object
+        status:
+          description: FooStatus defines the observed state of Foo
+          properties:
+            conditions:
+              description: Conditions is an array of conditions.
+              items:
+                properties:
+                  lastTransitionTime:
+                    description: Message is a human-readable message indicating details
+                      about last transition.
+                    format: date-time
+                    type: string
+                  message:
+                    description: Message is a human-readable message indicating details
+                      about last transition.
+                    type: string
+                  reason:
+                    description: Reason is a one-word CamelCase reason for the condition's
+                      last transition.
+                    type: string
+                  status:
+                    description: Status is the status of the condition
+                    type: string
+                  type:
+                    description: Type is the type fo the condition
+                    enum:
+                    - Ready
+                    type: string
+                required:
+                - lastTransitionTime
+                - status
+                - type
+                type: object
+              type: array
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

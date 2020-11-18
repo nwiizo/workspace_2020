@@ -1,0 +1,7 @@
+domain: samplecontroller.k8s.io
+repo: github.com/nwiizo/workspace_2020/blog/crd/kubebuilder
+resources:
+- group: foo
+  kind: Foo
+  version: v1
+version: "2"
