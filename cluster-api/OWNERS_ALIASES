@@ -1,0 +1,71 @@
+# See the OWNERS docs: https://git.k8s.io/community/contributors/guide/owners.md
+
+aliases:
+  sig-cluster-lifecycle-leads:
+  - neolit123
+  - justinsb
+  - timothysc
+  - fabriziopandini
+
+  # -----------------------------------------------------------
+  # OWNER_ALIASES for Cluster API
+  # -----------------------------------------------------------
+
+  # active folks who can be contacted to perform admin-related
+  # tasks on the repo, or otherwise approve any PRS.
+  cluster-api-admins:
+  - justinsb
+  - detiber
+  - davidewatson
+  - vincepri
+
+  # non-admin folks who have write-access and can approve any PRs in the repo
+  cluster-api-maintainers:
+  - justinsb
+  - detiber
+  - vincepri
+  - CecileRobertMichon
+
+  # folks who can review and LGTM any PRs in the repo
+  cluster-api-reviewers:
+  - CecileRobertMichon
+  - vincepri
+  - JoelSpeed
+
+  # -----------------------------------------------------------
+  # OWNER_ALIASES for docs/book
+  # -----------------------------------------------------------
+
+  # folks who can review and LGTM any PRs under docs/book
+  cluster-api-book-reviewers:
+  - randomvariable
+  - moshloop
+
+  # -----------------------------------------------------------
+  # OWNER_ALIASES for test/infrastructure/docker
+  # -----------------------------------------------------------
+
+  cluster-api-provider-docker-maintainers:
+  - fabriziopandini
+
+  # -----------------------------------------------------------
+  # OWNER_ALIASES for bootstrap/kubeadm
+  # -----------------------------------------------------------
+
+  cluster-api-bootstrap-provider-kubeadm-maintainers:
+  - fabriziopandini
+  - SataQiu
+
+  cluster-api-bootstrap-provider-kubeadm-reviewers:
+  - fabriziopandini
+
+  # -----------------------------------------------------------
+  # OWNER_ALIASES for cmd/clusterctl
+  # -----------------------------------------------------------
+
+  cluster-api-clusterctl-maintainers:
+  - fabriziopandini
+
+  cluster-api-clusterctl-reviewers:
+  - fabriziopandini
+  - wfernandes
